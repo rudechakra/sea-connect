@@ -131,6 +131,7 @@ select{width:100%;font:inherit;padding:12px;border-radius:10px;border:1.5px soli
     </div>
     <p class="mute" style="margin-top:16px">This is the pre-work for the Flutter SEA webinar on biases in everyday decisions. Nothing here is linked to your name. After each decision you will see whether it held up; the reasons, and what colleagues across the region chose, are for the webinar.</p>
     <button class="btn" onclick="go('s-profile')">Start</button>
+    <p class="tiny">v3.1</p>
   </section>
 
   <!-- PROFILE -->
@@ -216,7 +217,7 @@ select{width:100%;font:inherit;padding:12px;border-radius:10px;border:1.5px soli
       <h3>One decision is still waiting</h3>
       <p>The fourth moment happens live in the webinar, with everyone at once. Your answers are saved without your name. Bring your reasoning; see you there.</p>
     </div>
-    <p class="tiny">SEA Connect — Six Weeks · MIDA for Flutter SEA · Inclusion Skill Program</p>
+    <p class="tiny">SEA Connect — Six Weeks · MIDA for Flutter SEA · Inclusion Skill Program · v3.1</p>
   </section>
 </div>
 
@@ -362,10 +363,16 @@ async function nextWeek(){
 async function api(params){
   try{ localStorage.setItem('seaconnect_'+S.sid+'_'+params.action+'_'+(params.moment||''), JSON.stringify(params)); }catch(e){}
   if(!ONLINE) return {offline:true};
+  const url = SCRIPT_URL+'?'+new URLSearchParams(params).toString();
+  // "no-cors" sends the request without asking the browser to read the reply,
+  // so Safari/iPhone and strict browsers do not block it. The script records it on arrival.
   try{
-    const url = SCRIPT_URL+'?'+new URLSearchParams(params).toString();
-    const res = await fetch(url); return await res.json();
-  }catch(e){ console.warn('save failed',e); return {error:String(e)}; }
+    await fetch(url, {method:'GET', mode:'no-cors', keepalive:true, cache:'no-store'});
+    return {ok:true};
+  }catch(e){
+    try{ (new Image()).src = url; }catch(_){}  // fallback ping
+    return {error:String(e)};
+  }
 }
 renderWeeks();
 </script>
