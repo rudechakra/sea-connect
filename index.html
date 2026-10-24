@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0D1B4C">
+<title>SEA Connect — Six Weeks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B4C; --navy2:#121F5E; --blue:#1E8CFF; --sky:#E9F2FF; --yellow:#F6C544;
+  --ink:#0D1B4C; --mute:#5B6690; --line:#D9E2F5; --bg:#F4F7FD; --white:#fff;
+  --ok:#2FB673; --no:#E5484D; --r:14px;
+  --font:'Poppins',system-ui,sans-serif; --disp:'Space Grotesk','Poppins',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.5}
+button{font:inherit;cursor:pointer;border:0}
+button:focus-visible,select:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.app{max-width:640px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+/* top bar */
+.bar{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.wordmark{font-family:var(--disp);font-weight:700;letter-spacing:.02em;font-size:17px;line-height:1.05}
+.wordmark small{display:block;font-family:var(--font);font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.weeks{display:flex;gap:6px;align-items:center}
+.weeks span{width:26px;height:6px;border-radius:3px;background:rgba(255,255,255,.22)}
+.weeks span.done{background:var(--yellow)}
+.weeks span.now{background:var(--blue)}
+.score{background:var(--yellow);color:var(--navy);font-weight:700;font-size:13px;padding:4px 10px;border-radius:20px;min-width:52px;text-align:center}
+/* screens */
+.screen{display:none;flex:1;padding:22px 18px 40px;animation:in .28s ease}
+.screen.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen{animation:none}}
+h1{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:-.01em;line-height:1.02;font-size:38px}
+h2{font-family:var(--disp);font-weight:700;text-transform:uppercase;font-size:22px;line-height:1.1;margin-bottom:10px}
+h3{font-size:15px;font-weight:600;margin-bottom:6px}
+p{margin-bottom:12px}
+.lead{font-size:17px;color:var(--ink)}
+.mute{color:var(--mute);font-size:14px}
+.btn{display:block;width:100%;background:var(--blue);color:#fff;font-weight:600;font-size:16px;padding:15px 18px;border-radius:12px;margin-top:18px;transition:transform .08s}
+.btn:active{transform:scale(.99)}
+.btn[disabled]{background:#B9C6E4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--navy);border:2px solid var(--navy)}
+/* welcome hero */
+.hero{background:linear-gradient(118deg,var(--navy) 0%,var(--navy2) 55%,#0A2A8A 100%);color:#fff;border-radius:var(--r);padding:30px 22px 26px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-60px;top:-30px;width:220px;height:320px;background:linear-gradient(160deg,rgba(30,140,255,.55),rgba(30,140,255,0));transform:skewX(-18deg)}
+.hero h1{position:relative}
+.hero h1 em{font-style:normal;color:var(--yellow)}
+.hero .sub{position:relative;margin-top:12px;font-size:15px;opacity:.92}
+.facts{display:flex;gap:10px;margin-top:16px;position:relative}
+.facts div{flex:1;background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px}
+.facts b{font-family:var(--disp);font-size:22px;display:block;line-height:1}
+.facts span{font-size:11px;opacity:.85}
+/* profile */
+.field{margin-bottom:16px}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+select{width:100%;font:inherit;padding:12px;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:12px 8px;border-radius:10px;background:#fff;border:1.5px solid var(--line);color:var(--ink);font-weight:500;font-size:14px}
+.seg button.sel{background:var(--navy);color:#fff;border-color:var(--navy)}
+/* context */
+.brief{background:var(--navy);color:#fff;border-radius:var(--r);padding:18px 20px;margin-bottom:16px}
+.brief h2{color:var(--yellow)}
+.brief dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;margin-top:10px}
+.brief dt{opacity:.7}.brief dd{font-weight:600}
+.cast{display:grid;gap:10px}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:14px 14px 14px 12px;display:flex;gap:12px}
+.av{flex:0 0 44px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:700;color:#fff;font-size:15px}
+.card h3{margin-bottom:1px}
+.card .role{font-size:12px;color:var(--mute);margin-bottom:6px}
+.card p{font-size:13.5px;margin:0}
+.you{background:var(--sky);border-color:#BBD5FF}
+/* feed */
+.status{background:var(--navy);color:#fff;border-radius:var(--r);padding:14px 16px;margin-bottom:14px;font-size:14px}
+.status p{margin:0;opacity:.95}
+.weekhead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.weekhead h2{margin:0}
+.weekhead span{font-size:13px;color:var(--mute)}
+.msg{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start}
+.msg .av{flex-basis:36px;width:36px;height:36px;font-size:13px}
+.bubble{background:#fff;border:1.5px solid var(--line);border-radius:4px 14px 14px 14px;padding:10px 13px;flex:1}
+.bubble .who{font-size:12px;font-weight:600;display:flex;justify-content:space-between;gap:8px;margin-bottom:3px}
+.bubble .who span{font-weight:400;color:var(--mute)}
+.bubble p{font-size:14px;margin:0}
+.msg.unk .bubble{background:#F8F5E6;border-color:#EBDDA0}
+/* moment */
+.scene{background:#fff;border-left:5px solid var(--yellow);border-radius:6px 14px 14px 6px;padding:14px 16px;margin-bottom:16px;font-size:15px}
+.scene p:last-child{margin:0}
+.q{font-weight:600;font-size:16px;margin-bottom:12px}
+.opt{display:flex;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:10px;color:var(--ink);font-size:14.5px;line-height:1.4;transition:border-color .12s,background .12s}
+.opt b{font-family:var(--disp);flex:0 0 22px;color:var(--blue)}
+.opt.sel{border-color:var(--blue);background:var(--sky)}
+/* result */
+.verdict{border-radius:var(--r);padding:30px 22px;color:#fff;text-align:center;margin-bottom:16px}
+.verdict.ok{background:var(--ok)}.verdict.no{background:var(--no)}
+.verdict h2{font-size:34px;margin:0 0 6px}
+.verdict p{margin:0;opacity:.95}
+.tally{display:flex;gap:6px;justify-content:center;margin:14px 0 6px}
+.tally i{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:13px;background:#E3E8F5;color:var(--mute)}
+.tally i.ok{background:var(--ok);color:#fff}.tally i.no{background:var(--no);color:#fff}
+.note{background:#fff;border:1.5px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--mute)}
+/* end */
+.final{background:var(--navy);color:#fff;border-radius:var(--r);padding:28px 22px;text-align:center}
+.final .big{font-family:var(--disp);font-size:64px;font-weight:700;color:var(--yellow);line-height:1}
+.final p{opacity:.92}
+.tiny{font-size:11px;color:var(--mute);text-align:center;margin-top:24px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:8px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.teaser{background:var(--yellow);color:var(--navy);border-radius:var(--r);padding:16px 18px;margin-top:14px}
+.teaser h3{font-family:var(--disp);text-transform:uppercase;font-size:16px}
+.teaser p{margin:0;font-size:14px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <div class="wordmark">Flutter SEA<small>Inclusion Skill Program</small></div>
+    <div class="weeks" id="weeks" aria-hidden="true"></div>
+    <div class="score" id="scorechip" aria-live="polite">0 / 3</div>
+  </div>
+
+  <!-- WELCOME -->
+  <section class="screen on" id="s-welcome">
+    <div class="hero">
+      <h1>SEA Connect<br><em>Six weeks</em></h1>
+      <p class="sub">You have just been handed the Flutter SEA town hall. Over six weeks you will face three decisions of the kind we all take in an ordinary week, usually in a hurry. There is no trick and no exam: decide as you really would.</p>
+      <div class="facts"><div><b>3</b><span>decisions</span></div><div><b>6'</b><span>to play</span></div><div><b>0</b><span>names asked</span></div></div>
+    </div>
+    <p class="mute" style="margin-top:16px">This is the pre-work for the Flutter SEA webinar on biases in everyday decisions. Nothing here is linked to your name. After each decision you will see whether it held up; the reasons, and what colleagues across the region chose, are for the webinar.</p>
+    <button class="btn" onclick="go('s-profile')">Start</button>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen" id="s-profile">
+    <h2>Before you start</h2>
+    <p class="mute">Three quick questions. They are not linked to you; they help us read the overall picture.</p>
+    <div class="field">
+      <label for="country">Where are you based?</label>
+      <select id="country">
+        <option value="">Choose…</option>
+        <option>Italy</option><option>Turkey</option><option>Albania</option><option>Morocco</option><option>Spain</option><option>Portugal</option><option>France</option><option>Malta</option><option>Ireland</option><option>United Kingdom</option><option>Other</option><option>Prefer not to say</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Do you manage people?</label>
+      <div class="seg" id="mgr"><button data-v="Yes">Yes</button><button data-v="No">No</button></div>
+    </div>
+    <div class="field">
+      <label>In your opinion, how much do biases affect your everyday decisions?</label>
+      <div class="seg" id="blind"><button data-v="Little">Little</button><button data-v="Somewhat">Somewhat</button><button data-v="A lot">A lot</button></div>
+    </div>
+    <button class="btn" id="btn-profile" disabled onclick="saveProfile()">Continue</button>
+  </section>
+
+  <!-- CONTEXT -->
+  <section class="screen" id="s-context">
+    <div class="brief">
+      <h2>Your brief</h2>
+      <p style="font-size:14.5px">Monday 20 October, Milan headquarters. Marta Colombo, Head of People &amp; Culture, has asked you to take over SEA Connect, the regional town hall. By Friday 5 December you need a running order, a stage and a live stream that works for everyone watching across the region. You lead a small squad in three cities, with no formal authority over any of them.</p>
+      <dl>
+        <dt>Date</dt><dd>Friday 5 December</dd>
+        <dt>In the room</dt><dd>400 people, Milan</dd>
+        <dt>Online</dt><dd>Istanbul, Tirana, Casablanca, Tunis, Madrid</dd>
+        <dt>Time</dt><dd>Six weeks</dd>
+      </dl>
+    </div>
+    <h2>Your squad</h2>
+    <div class="cast">
+      <div class="card you"><div class="av" style="background:var(--blue)">YOU</div><div><h3>You</h3><div class="role">Project lead, Milan · first big project</div><p>Well liked, no formal authority. Marta is your sponsor.</p></div></div>
+      <div class="card"><div class="av" style="background:#E0457B">MC</div><div><h3>Marta Colombo</h3><div class="role">Head of People &amp; Culture, Milan · your sponsor</div><p>Warm, fast, quotes numbers with total conviction. Wants a win.</p></div></div>
+      <div class="card"><div class="av" style="background:#F6A623">LF</div><div><h3>Luca Ferraro</h3><div class="role">Internal Comms, Milan · your old classmate</div><p>Charming, always in the corridor. Volunteers for anything visible.</p></div></div>
+      <div class="card"><div class="av" style="background:#7B61FF">EK</div><div><h3>Elif Kaya</h3><div class="role">Insights, Istanbul · camera off</div><p>Precise. Has the numbers and offers them once. Writes late.</p></div></div>
+      <div class="card"><div class="av" style="background:#2FB673">AH</div><div><h3>Arben Hoxha</h3><div class="role">Tech lead, Tirana · streaming and app</div><p>Few words. Team of twelve. Has never missed a date.</p></div></div>
+    </div>
+    <button class="btn" onclick="startWeek(0)">Begin week 1</button>
+  </section>
+
+  <!-- FEED -->
+  <section class="screen" id="s-feed">
+    <div class="weekhead"><h2 id="f-title"></h2><span id="f-sub"></span></div>
+    <div class="status" id="f-status"></div>
+    <div id="f-list"></div>
+    <button class="btn" onclick="showMoment()">Now decide</button>
+  </section>
+
+  <!-- MOMENT -->
+  <section class="screen" id="s-moment">
+    <div class="weekhead"><h2 id="m-title"></h2><span id="m-sub"></span></div>
+    <div class="scene" id="m-scene"></div>
+    <div class="q" id="m-q"></div>
+    <div id="m-opts"></div>
+    <button class="btn" id="btn-lock" disabled onclick="lockAnswer()">Lock my decision</button>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="s-result">
+    <div class="verdict" id="r-box"><h2 id="r-h"></h2><p id="r-p"></p></div>
+    <div class="tally" id="r-tally"></div>
+    <div class="note">We are not explaining the answer here. In the webinar we will look at what colleagues across the region chose, and why. Hold on to your reasoning until then.</div>
+    <button class="btn" id="btn-next" onclick="nextWeek()">Next</button>
+  </section>
+
+  <!-- END -->
+  <section class="screen" id="s-end">
+    <div class="final">
+      <h2 style="color:var(--yellow)">Friday 5 December</h2>
+      <p>SEA Connect goes live: four hundred people in Milan, the rest of the region online, on a stream that runs clean. Whatever happened along the way, you got it over the line.</p>
+      <div class="big" id="e-score">0/3</div>
+      <p>right decisions out of three</p>
+      <div class="tally" id="e-tally"></div>
+    </div>
+    <div class="teaser">
+      <h3>One decision is still waiting</h3>
+      <p>The fourth moment happens live in the webinar, with everyone at once. Your answers are saved without your name. Bring your reasoning; see you there.</p>
+    </div>
+    <p class="tiny">SEA Connect — Six Weeks · MIDA for Flutter SEA · Inclusion Skill Program</p>
+  </section>
+</div>
+
+<script>
+// ================= CONFIG =================
+const SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE'; // Google Apps Script web app URL
+const ONLINE = SCRIPT_URL.startsWith('https://');
+
+// ================= CONTENT =================
+// version: coin flip for the randomised moment (M1 anchoring). 'A' = low anchor, 'B' = high anchor.
+const VERSION = Math.random() < 0.5 ? 'A' : 'B';
+const AV = {
+  marta:{i:'MC',c:'#E0457B',n:'Marta Colombo',r:'Head of People & Culture'},
+  luca:{i:'LF',c:'#F6A623',n:'Luca Ferraro',r:'Internal Comms, Milan'},
+  elif:{i:'EK',c:'#7B61FF',n:'Elif Kaya',r:'Insights, Istanbul'},
+  arben:{i:'AH',c:'#2FB673',n:'Arben Hoxha',r:'Tech lead, Tirana'},
+  floor:{i:'4F',c:'#8A93B5',n:'Fourth floor',r:'Comms distribution list'},
+};
+
+const WEEKS = [
+ {
+  label:'Week 1', sub:'Monday 20 October', bias:'anchoring',
+  status:'Your first week. Giorgio’s folders are half empty, and on Wednesday Marta presents the first outline to the Board. Nothing is decided yet. The squad have written to introduce themselves.',
+  feed:[
+   {w:'elif',t:'09:12',p:'Welcome aboard. Online attendance for the last three town halls: 900, 1,050 and 980. File is in the shared folder.'},
+   {w:'luca',t:'10:40',p:'Massive that you got this. Everyone on the fourth floor says this year has to be bigger. Marta has been telling people it will be.'},
+  ],
+  title:'The number', sub2:'Wednesday, 16:30',
+  scene:'An hour before the Board. Marta arrives with two coffees and her laptop open on the SEA Connect slide. "They will want one number: the online audience. Last year we had about <b>{ANCHOR}</b> online, I am fairly sure. So what do we put down? Something they can get behind." The cursor blinks in the empty box. Elif’s file is somewhere in your inbox.',
+  q:'What goes on the slide?',
+  opts:[
+   {id:'B',t:'{ANCHOR}. Marta knows what this Board responds to, and it is her slide.'},
+   {id:'C',t:'Around 1,000, because that is what the last three years actually show.'},
+   {id:'A',t:'{MID}. Between Marta’s figure and the record, so nobody is embarrassed later.'},
+   {id:'D',t:'Leave the box empty and ask the Board what number they would like to see.'},
+  ], correct:'C'
+ },
+ {
+  label:'Week 4', sub:'Monday 10 November', bias:'affinity', inclusion:true,
+  status:'The plan is real now: a venue, a host, a running order checked line by line with Tirana. The Regional CEO wants one member of your squad to walk through the plan on the main stage. It is a visible slot, the kind people remember at promotion time.',
+  feed:[
+   {w:'marta',t:'08:30',p:'Main stage, ten minutes, one of your squad presents the plan with the Regional CEO. Your call. Pick whoever will land it.'},
+   {w:'luca',t:'08:41',p:'Happy to take the CEO slot. I know half the leadership team from the Christmas party. Just say the word.'},
+   {w:'elif',t:'23:10',p:'Running order v7 attached, every timing checked with Tirana. If someone needs to walk the CEO through it, I know it by heart.'},
+  ],
+  title:'The stage', sub2:'Tuesday, 11:00',
+  scene:'Luca leans on your desk with a coffee, as he has since university. "The CEO slot. Just say the word." He would be good; he always is in a room. On your phone is Elif’s message from last night: forty pages, every timing checked, and one line offering to present. Three people on the fourth floor have told you Luca is the obvious choice. Marta wants a name by lunch.',
+  q:'Who stands on the main stage with the Regional CEO?',
+  opts:[
+   {id:'A',t:'Luca. He is a natural on stage, and the leadership team already knows him.'},
+   {id:'B',t:'Elif. It is her plan, and it is about time the leadership team met her.'},
+   {id:'C',t:'Me. I know the whole picture, and I will credit the squad on the last slide.'},
+   {id:'D',t:'Luca presents on stage, and Elif joins online to take the detailed questions.'},
+  ], correct:'B'
+ },
+ {
+  label:'Week 6', sub:'Monday 1 December', bias:'attribution', inclusion:true,
+  status:'The last week. Everything rests on the live stream from Tirana. Arben’s first test worked cleanly. Since then you have moved the dress rehearsal forward to Wednesday, without asking Arben whether his team could absorb it. Marta has told the Board it is all under control, because you told her so.',
+  feed:[
+   {w:'arben',t:'Last week',p:'Group Security pulled six of my twelve onto an audit until the 3rd. We will manage.'},
+   {w:'luca',t:'Yesterday',p:'Has Arben gone quiet on you? He has on me. I would keep an eye on that.'},
+  ],
+  title:'The test', sub2:'Wednesday, 18:45',
+  scene:'The dress rehearsal from Tirana has just failed: first the sound, then the picture, then the whole feed. Two days to go. Arben writes: "We know what it is. Testing again at nine tonight. Six people are still on the Security audit, so it is the six of us." Marta calls, frightened rather than angry. "I told the Board the stream was safe because you said so. What happened?"',
+  q:'What do you answer?',
+  opts:[
+   {id:'D',t:'"Arben’s team missed the test. I am flying out tomorrow to manage it directly."'},
+   {id:'C',t:'"Half his team is on the Group audit and I moved the test. We re-run it tonight."'},
+   {id:'A',t:'"Arben is good, but he is not reliable under pressure. We should have known that."'},
+   {id:'B',t:'"Rehearsals fail, that is what they are for. It will be fine on the day."'},
+  ], correct:'C'
+ }
+];
+const N = WEEKS.length;
+
+// ================= STATE =================
+const S = { sid:null, week:0, choice:null, results:[], t0:0, country:'', mgr:'', blind:'' };
+const anchors = VERSION==='A' ? {ANCHOR:'800',MID:'900'} : {ANCHOR:'2,000',MID:'1,500'};
+const fill = s => s.replace(/\{ANCHOR\}/g,anchors.ANCHOR).replace(/\{MID\}/g,anchors.MID);
+
+function uid(){ return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function $(id){ return document.getElementById(id); }
+function go(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); window.scrollTo(0,0); }
+function renderWeeks(){ $('weeks').innerHTML = WEEKS.map((w,i)=>`<span class="${i<S.results.length?'done':(i===S.week&&S.results.length===i?'now':'')}"></span>`).join(''); }
+function renderScore(){ const ok=S.results.filter(r=>r.correct).length; $('scorechip').textContent = ok+' / '+N; }
+
+// profile segments
+['mgr','blind'].forEach(g=>{ $(g).querySelectorAll('button').forEach(b=>b.onclick=()=>{ $(g).querySelectorAll('button').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); S[g]=b.dataset.v; checkProfile(); }); });
+$('country').onchange = ()=>{ S.country=$('country').value; checkProfile(); };
+function checkProfile(){ $('btn-profile').disabled = !(S.country && S.mgr && S.blind); }
+
+async function saveProfile(){
+  S.sid = uid();
+  const b=$('btn-profile'); b.innerHTML='<span class="spin"></span>Saving'; b.disabled=true;
+  await api({action:'start', sid:S.sid, version:VERSION, country:S.country, mgr:S.mgr, blind:S.blind});
+  b.textContent='Continue'; b.disabled=false;
+  go('s-context'); renderWeeks();
+}
+
+function startWeek(i){
+  S.week=i; const w=WEEKS[i]; renderWeeks();
+  $('f-title').textContent=w.label; $('f-sub').textContent=w.sub;
+  $('f-status').innerHTML=w.status?'<p>'+w.status+'</p>':'';
+  $('f-list').innerHTML = w.feed.map(m=>{ const a=AV[m.w]; return `<div class="msg ${m.w==='floor'?'unk':''}"><div class="av" style="background:${a.c}">${a.i}</div><div class="bubble"><div class="who">${a.n}<span>${m.t}</span></div><p>${m.p}</p></div></div>`; }).join('');
+  go('s-feed');
+}
+
+function showMoment(){
+  const w=WEEKS[S.week]; S.choice=null; S.t0=Date.now();
+  $('m-title').textContent=w.title; $('m-sub').textContent=w.sub2;
+  $('m-scene').innerHTML='<p>'+fill(w.scene)+'</p>'; $('m-q').textContent=w.q;
+  const opts=[...w.opts].sort(()=>Math.random()-.5); // shuffle to remove position effects
+  $('m-opts').innerHTML = opts.map((o,i)=>`<button class="opt" data-id="${o.id}"><b>${'ABCD'[i]}</b><span>${fill(o.t)}</span></button>`).join('');
+  $('m-opts').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ $('m-opts').querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); S.choice=b.dataset.id; $('btn-lock').disabled=false; });
+  $('btn-lock').disabled=true; $('btn-lock').textContent='Lock my decision';
+  go('s-moment');
+}
+
+async function lockAnswer(){
+  const w=WEEKS[S.week]; const ok = S.choice===w.correct; const secs=Math.round((Date.now()-S.t0)/1000);
+  S.results.push({week:S.week, choice:S.choice, correct:ok});
+  const b=$('btn-lock'); b.innerHTML='<span class="spin"></span>Saving'; b.disabled=true;
+  await api({action:'answer', sid:S.sid, moment:S.week+1, bias:w.bias, choice:S.choice, correct:ok?1:0, version:VERSION, secs});
+  renderScore(); renderWeeks();
+  const box=$('r-box'); box.className='verdict '+(ok?'ok':'no');
+  $('r-h').textContent = ok ? 'Good call' : 'Not quite';
+  $('r-p').textContent = ok ? 'That one holds up well. On to the next week.' : 'Not to worry: this is exactly the kind of decision we will look at together. Carry on.';
+  $('r-tally').innerHTML = tally();
+  $('btn-next').textContent = S.week<N-1 ? 'Next week' : 'See the ending';
+  go('s-result');
+}
+function tally(){ return WEEKS.map((w,i)=>{ const r=S.results[i]; return `<i class="${r?(r.correct?'ok':'no'):''}">${i+1}</i>`; }).join(''); }
+
+async function nextWeek(){
+  if (S.week<N-1) return startWeek(S.week+1);
+  const ok=S.results.filter(r=>r.correct).length;
+  $('e-score').textContent=ok+'/'+N; $('e-tally').innerHTML=tally();
+  go('s-end');
+  await api({action:'complete', sid:S.sid, score:ok});
+}
+
+// ================= BACKEND =================
+async function api(params){
+  try{ localStorage.setItem('seaconnect_'+S.sid+'_'+params.action+'_'+(params.moment||''), JSON.stringify(params)); }catch(e){}
+  if(!ONLINE) return {offline:true};
+  try{
+    const url = SCRIPT_URL+'?'+new URLSearchParams(params).toString();
+    const res = await fetch(url); return await res.json();
+  }catch(e){ console.warn('save failed',e); return {error:String(e)}; }
+}
+renderWeeks();
+</script>
+</body>
+</html>

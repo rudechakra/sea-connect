@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>SEA Connect Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B4C; --blue:#1E8CFF; --sky:#E9F2FF; --yellow:#F6C544; --ink:#0D1B4C; --mute:#5B6690;
+  --line:#D9E2F5; --bg:#F4F7FD; --card:#fff; --ok:#2FB673; --bar:#9AA6D1; --r:14px;
+  --font:'Poppins',system-ui,sans-serif; --disp:'Space Grotesk','Poppins',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.45;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 48px}
+header{background:var(--navy);color:#fff;padding:14px 0;margin-bottom:22px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:0}
+.wm{font-family:var(--disp);font-weight:700;font-size:20px;line-height:1.05}
+.wm small{display:block;font-family:var(--font);font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:600}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ctl input[type=password]{font:inherit;font-size:14px;padding:8px 10px;border-radius:8px;border:0;width:150px}
+.ctl button,.btn{font:inherit;font-size:14px;font-weight:600;padding:8px 14px;border-radius:8px;border:0;background:var(--yellow);color:var(--navy);cursor:pointer}
+.ctl label{font-size:13px;display:flex;gap:6px;align-items:center;opacity:.9}
+.status{font-size:13px;color:var(--mute);margin-bottom:14px}
+.status.err{color:#C4373C;font-weight:600}
+h2{font-family:var(--disp);text-transform:uppercase;font-size:20px;margin:28px 0 12px}
+h3{font-size:15px;font-weight:600;margin-bottom:2px}
+.sub{font-size:13px;color:var(--mute);margin-bottom:12px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.tile{background:var(--navy);color:#fff;border-radius:var(--r);padding:16px 18px}
+.tile b{font-family:var(--disp);font-size:34px;color:var(--yellow);display:block;line-height:1.1}
+.tile span{font-size:13px;opacity:.9}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.big{font-family:var(--disp);font-size:30px;font-weight:700}
+.bars{margin-top:10px;display:grid;gap:8px}
+.row{display:grid;grid-template-columns:minmax(110px,40%) 1fr 44px;gap:8px;align-items:center;font-size:13px}
+.track{background:#EEF2FA;border-radius:6px;height:18px;overflow:hidden}
+.fill{height:100%;background:var(--bar);border-radius:6px}
+.fill.ok{background:var(--ok)}
+.fill.a{background:var(--blue)}.fill.b{background:var(--yellow)}
+.row .v{text-align:right;font-weight:600}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--sky);color:var(--navy);margin-left:6px;vertical-align:2px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:#fff;border-radius:var(--r);overflow:hidden}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line)}
+th{background:var(--sky);font-weight:600}
+th:not(:first-child){text-align:right}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.locked{background:#fff;border:1.5px dashed var(--line);border-radius:var(--r);padding:16px;color:var(--mute);font-size:14px}
+.deck{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:16px 18px;font-size:14px}
+.deck li{margin:4px 0 4px 18px}
+.deck .btn{margin-top:12px}
+.empty{color:var(--mute);font-size:14px}
+@media (max-width:520px){.row{grid-template-columns:minmax(90px,42%) 1fr 40px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="wm">SEA Connect<small>Results · Flutter SEA</small></div>
+    <div class="ctl">
+      <input id="key" type="password" placeholder="Admin key" aria-label="Admin key">
+      <button id="refresh">Refresh</button>
+      <label><input type="checkbox" id="auto"> auto, 30s</label>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <p class="status" id="status">Loading…</p>
+  <div id="out"></div>
+</main>
+
+<script>
+// ================= CONFIG =================
+const SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE'; // same URL as in flutter-sea.html
+const API = new URLSearchParams(location.search).get('api') || SCRIPT_URL;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+try { $('key').value = localStorage.getItem('seaconnect_key') || ''; } catch (e) {}
+
+async function load() {
+  if (!API.startsWith('http')) {
+    $('status').className = 'status err';
+    $('status').textContent = 'No backend yet: paste the Apps Script web app URL into SCRIPT_URL in this file.';
+    return;
+  }
+  const key = $('key').value.trim();
+  try { localStorage.setItem('seaconnect_key', key); } catch (e) {}
+  $('status').className = 'status'; $('status').textContent = 'Loading…';
+  try {
+    const res = await fetch(API + '?action=stats&key=' + encodeURIComponent(key));
+    const d = await res.json();
+    if (d.ok === false) throw new Error(d.error);
+    render(d);
+    $('status').textContent = 'Updated ' + new Date(d.updated).toLocaleString() + (d.admin ? ' · admin view' : '');
+  } catch (e) {
+    $('status').className = 'status err';
+    $('status').textContent = 'Could not load results: ' + e.message;
+  }
+}
+
+function bars(choices, correct, cls) {
+  return '<div class="bars">' + choices.map(c =>
+    `<div class="row"><span>${esc(c.label)}</span><div class="track"><div class="fill ${cls || (c.id === correct ? 'ok' : '')}" style="width:${c.pct}%"></div></div><span class="v">${c.pct}%</span></div>`
+  ).join('') + '</div>';
+}
+
+function render(d) {
+  const m = d.moments;
+  const little = d.self_rating.find(s => s.answer === 'Little') || {pct: 0};
+  if (!d.started) { $('out').innerHTML = '<p class="empty">No players yet. Results appear here as soon as the first person starts the game.</p>'; return; }
+
+  let h = `<div class="tiles">
+    <div class="tile"><b>${d.completed}</b><span>completed the game (${d.started} started)</span></div>
+    <div class="tile"><b>${d.avg_score ?? '–'} / ${d.out_of}</b><span>average score</span></div>
+    <div class="tile"><b>${little.pct}%</b><span>said biases affect their decisions only a little</span></div>
+  </div>`;
+
+  h += '<h2>Per moment</h2><div class="grid">' + m.map(x => `
+    <div class="card"><h3>Moment ${x.n}: ${esc(x.title)}<span class="tag">${esc(x.bias)}</span></h3>
+    <div class="sub">${x.answers} answers</div>
+    <div class="big">${x.pct_correct}%</div><div class="sub">got it right</div>
+    ${bars(x.choices, x.correct)}</div>`).join('') + '</div>';
+
+  const v = m[0].by_version;
+  h += `<h2>The anchoring experiment</h2><p class="sub">Moment 1, split by which number Marta said. Same file from Elif, same right answer.</p><div class="grid">
+    <div class="card"><h3>Marta said 800</h3><div class="sub">${v.A.answers} answers · ${v.A.pct_correct}% chose the record</div>${bars(v.A.choices, '', 'a')}</div>
+    <div class="card"><h3>Marta said 2,000</h3><div class="sub">${v.B.answers} answers · ${v.B.pct_correct}% chose the record</div>${bars(v.B.choices, '', 'b')}</div>
+  </div>`;
+
+  h += `<h2>Self-rating and score</h2><p class="sub">"In your opinion, how much do biases affect your everyday decisions?" Average scores are shown only for groups of 5 or more.</p>
+    <table><tr><th>Answer</th><th>Players</th><th>Share</th><th>Average score</th></tr>` +
+    d.self_rating.map(s => `<tr><td>${esc(s.answer)}</td><td class="n">${s.players}</td><td class="n">${s.pct}%</td><td class="n">${s.avg_score ?? '–'}</td></tr>`).join('') + '</table>';
+
+  h += '<h2>Splits</h2>';
+  if (d.admin) {
+    h += table('By country', d.by_country, m) + table('Manages people', d.by_manager, m);
+  } else {
+    h += '<div class="locked">Country and manager splits are admin only. Enter the admin key above and press Refresh.</div>';
+  }
+
+  const pick = (x, id) => (x.choices.find(c => c.id === id) || {pct: 0}).pct;
+  const deck = [
+    `Slide 3 · completed: ${d.completed} · average: ${d.avg_score ?? '–'} / ${d.out_of} · "only a little": ${little.pct}% · per moment: ${m.map(x => x.pct_correct + '%').join(', ')}`,
+    `Slide 4 · The number: ` + m[0].choices.map(c => `${c.label} ${c.pct}%`).join(' · '),
+    `Slide 5 · Marta said 800: ` + v.A.choices.map(c => `${c.label} ${c.pct}%`).join(' · ') + ` | Marta said 2,000: ` + v.B.choices.map(c => `${c.label} ${c.pct}%`).join(' · '),
+    `Slide 6 · The stage: ` + m[1].choices.map(c => `${c.label} ${c.pct}%`).join(' · '),
+    `Slide 7 · The test: ` + m[2].choices.map(c => `${c.label} ${c.pct}%`).join(' · '),
+  ];
+  h += `<h2>Numbers for the deck</h2><div class="deck"><ul>${deck.map(l => '<li>' + esc(l) + '</li>').join('')}</ul>
+    <button class="btn" id="copy">Copy all</button></div>`;
+
+  $('out').innerHTML = h;
+  $('copy').onclick = () => { navigator.clipboard.writeText(deck.join('\n')).then(() => { $('copy').textContent = 'Copied'; }); };
+}
+
+function table(title, rows, m) {
+  if (!rows || !rows.length) return `<h3 style="margin:14px 0 8px">${title}</h3><p class="empty">No completed games yet.</p>`;
+  return `<h3 style="margin:14px 0 8px">${title}</h3><table><tr><th>Group</th><th>Players</th><th>Avg score</th>${m.map(x => `<th>${esc(x.title)}</th>`).join('')}</tr>` +
+    rows.map(r => r.hidden
+      ? `<tr><td>${esc(r.group)}</td><td class="n">${r.players}</td><td colspan="${m.length + 1}" style="color:var(--mute)">fewer than 5, hidden</td></tr>`
+      : `<tr><td>${esc(r.group)}</td><td class="n">${r.players}</td><td class="n">${r.avg_score}</td>${r.pct_correct.map(p => `<td class="n">${p}%</td>`).join('')}</tr>`
+    ).join('') + '</table>';
+}
+
+let timer = null;
+$('refresh').onclick = load;
+$('key').addEventListener('keydown', e => { if (e.key === 'Enter') load(); });
+$('auto').onchange = () => { clearInterval(timer); if ($('auto').checked) timer = setInterval(load, 30000); };
+load();
+</script>
+</body>
+</html>
